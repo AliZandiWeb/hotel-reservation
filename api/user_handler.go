@@ -1,7 +1,7 @@
 package api
 
 import (
-	"context"
+	"fmt"
 
 	"github.com/AliZandiWeb/hotel-reservation/db"
 	"github.com/AliZandiWeb/hotel-reservation/types"
@@ -17,21 +17,38 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 		userStore: userStore,
 	}
 }
-
+func (h *UserHandler) HandlerPostUser(c *fiber.Ctx) error {
+	var params types.CreateUserParams
+	if err := c.BodyParser(&params); err != nil {
+		return err
+	}
+	if errors := params.Validate(); len(errors) > 0 {
+		return c.JSON(errors)
+	}
+	user, err := types.NewUserFromParams(params)
+	if err != nil {
+		return err
+	}
+	insertedUser, err := h.userStore.InsertUser(c.Context(), user)
+	if err != nil {
+		return err
+	}
+	return c.JSON(insertedUser)
+}
 func (h *UserHandler) HandlerGetUserByID(c *fiber.Ctx) error {
 	id := c.Params("id")
-	ctx := context.Background()
-	user, err := h.userStore.GetUserByID(ctx, id)
+
+	user, err := h.userStore.GetUserByID(c.Context(), id)
 	if err != nil {
 		return err
 	}
 	return c.JSON(user)
 }
-
 func (h *UserHandler) HandlerGetUsers(c *fiber.Ctx) error {
-	u := types.User{
-		FirstName: "Ali",
-		LastName:  "Zandi",
+	user, err := h.userStore.GetUsers(c.Context())
+	if err != nil {
+		return err
 	}
-	return c.JSON(u)
+	fmt.Println(user)
+	return c.JSON(user)
 }
