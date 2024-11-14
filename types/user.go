@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,26 +16,20 @@ const (
 	minPassword  = 6
 )
 
-func (params CreateUserParams) Validate() []string {
-	errors := []string{}
-	if len(params.FirstName) < minFristName {
-		errors = append(errors, fmt.Sprintf("firstName length should be at least %d characters", minFristName))
-	}
-	if len(params.LastName) < minLastName {
-		errors = append(errors, fmt.Sprintf("lastName length should be at least %d characters", minLastName))
-	}
-	if len(params.Password) < minPassword {
-		errors = append(errors, fmt.Sprintf("password length should be at least %d characters", minPassword))
-	}
-	if !isEmailValid(params.Email) {
-		errors = append(errors, fmt.Sprintf("email in invalid"))
-	}
-	return errors
+type UpdateUserParams struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 }
 
-func isEmailValid(e string) bool {
-	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	return emailRegex.MatchString(e)
+func (p UpdateUserParams) ToBSON() bson.M {
+	m := bson.M{}
+	if len(p.FirstName) > 0 {
+		m["firstName"] = p.FirstName
+	}
+	if len(p.LastName) > 0 {
+		m["lastName"] = p.LastName
+	}
+	return m
 }
 
 type CreateUserParams struct {
@@ -42,6 +37,28 @@ type CreateUserParams struct {
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
+}
+
+func (params CreateUserParams) Validate() map[string]string {
+	errors := map[string]string{}
+	if len(params.FirstName) < minFristName {
+		errors["firstname"] = fmt.Sprintf("firstName length should be at least %d characters", minFristName)
+	}
+	if len(params.LastName) < minLastName {
+		errors["lastname"] = fmt.Sprintf("lastName length should be at least %d characters", minLastName)
+	}
+	if len(params.Password) < minPassword {
+		errors["password"] = fmt.Sprintf("password length should be at least %d characters", minPassword)
+	}
+	if !isEmailValid(params.Email) {
+		errors["email"] = fmt.Sprintf("email in invalid")
+	}
+	return errors
+}
+
+func isEmailValid(e string) bool {
+	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	return emailRegex.MatchString(e)
 }
 
 type User struct {
