@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/AliZandiWeb/hotel-reservation/api"
+	"github.com/AliZandiWeb/hotel-reservation/api/middleware"
 	"github.com/AliZandiWeb/hotel-reservation/db"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -39,9 +40,15 @@ func main() {
 		}
 		userHandler  = api.NewUserHandler(userStore)
 		hotelHandler = api.NewHotelHandler(store)
+		authHandler  = api.NewAuthHandler(userStore)
 		app          = fiber.New(config)
-		apiv1        = app.Group("api/v1")
+		auth         = app.Group("/api")
+		apiv1        = app.Group("/api/v1", middleware.JWTAuthentication)
+		// apiv1 = app.Group("/api/v1")
 	)
+	// auth
+	auth.Post("/auth", authHandler.HandleAuthenticate)
+	// Versioned API routes
 	// user Handlers
 	apiv1.Get("/user", userHandler.HandlerGetUsers)
 	apiv1.Get("/user/:id", userHandler.HandlerGetUserByID)
@@ -49,7 +56,6 @@ func main() {
 	apiv1.Delete("/user/:id", userHandler.HandlerDeleteUser)
 	apiv1.Put("/user/:id", userHandler.HandlerPutUser)
 	// hotel Handlers
-
 	apiv1.Get("/hotel", hotelHandler.HandleGetHotels)
 	apiv1.Get("/hotel/:id", hotelHandler.HandleGetHotelByID)
 	apiv1.Get("/hotel/:id/rooms", hotelHandler.HandleGetRooms)
