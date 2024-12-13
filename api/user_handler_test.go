@@ -65,7 +65,7 @@ func TestPostUser(t *testing.T) {
 	json.NewDecoder(resp.Body).Decode(&user)
 	// fmt.Println(string(bb))
 	// fmt.Println(user)
-	if len(user.Id) == 0 {
+	if len(user.ID) == 0 {
 		t.Errorf("expecting a user id to be set")
 	}
 	if len(user.EncryptedPassword) > 0 {

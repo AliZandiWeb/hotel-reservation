@@ -76,7 +76,7 @@ func (s *MongoUserStore) InsertUser(ctx context.Context, user *types.User) (*typ
 	if err != nil {
 		return nil, err
 	}
-	user.Id = res.InsertedID.(primitive.ObjectID)
+	user.ID = res.InsertedID.(primitive.ObjectID)
 	return user, nil
 }
 

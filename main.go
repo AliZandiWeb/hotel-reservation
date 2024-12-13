@@ -44,7 +44,6 @@ func main() {
 		app          = fiber.New(config)
 		auth         = app.Group("/api")
 		apiv1        = app.Group("/api/v1", middleware.JWTAuthentication)
-		// apiv1 = app.Group("/api/v1")
 	)
 	// auth
 	auth.Post("/auth", authHandler.HandleAuthenticate)
