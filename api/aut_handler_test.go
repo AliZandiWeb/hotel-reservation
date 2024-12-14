@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -65,8 +66,10 @@ func TestAuthenticateSuccess(t *testing.T) {
 	// JSON Response
 	insertedUser.EncryptedPassword = ""
 	if !reflect.DeepEqual(insertedUser, authResp.User) {
-		// 	fmt.Println(insertedUser)
-		// 	fmt.Println(authResp.User)
+		// for check "insertedUser" & "authResp.User" why they not Equal we Println them
+		// to see what they have
+		// fmt.Println(insertedUser)
+		// fmt.Println(authResp.User)
 
 		t.Fatalf("expected the user to be  the insert user")
 	}
