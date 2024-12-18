@@ -22,7 +22,7 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 		if err != nil {
 			return err
 		}
-		fmt.Println("token: ", claims)
+		// fmt.Println("token: ", claims)
 		expiresFloat := claims["expires"].(float64)
 		expires := int64(expiresFloat)
 		//  check token expiration

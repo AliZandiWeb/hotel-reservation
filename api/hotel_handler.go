@@ -11,11 +11,6 @@ type HotelHandler struct {
 	store *db.Store
 }
 
-//	type HotelQueryParams struct {
-//		Rooms  bool
-//		Rating int
-//	}
-
 func NewHotelHandler(store *db.Store) *HotelHandler {
 	return &HotelHandler{
 		store: store,
