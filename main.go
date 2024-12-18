@@ -70,6 +70,7 @@ func main() {
 	//  TODO : cancell a booking
 	// // Booking Handlers
 	apiv1.Get("/booking/:id", bookingHandler.HandlerGetBooking)
+	apiv1.Get("/booking/:id/cancel", bookingHandler.HandleCancelBooking)
 	//  Admin
 	admin.Get("/booking", bookingHandler.HandlerGetBookings)
 	app.Listen(*listenAddr)
