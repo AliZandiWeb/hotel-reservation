@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/AliZandiWeb/hotel-reservation/db"
 	"github.com/AliZandiWeb/hotel-reservation/types"
@@ -33,7 +32,7 @@ func (h *UserHandler) HandlerPutUser(c *fiber.Ctx) error {
 		return err
 	}
 	if err := c.BodyParser(&params); err != nil {
-		return err
+		return ErrBadRequest()
 	}
 	filter := bson.M{"_id": oid}
 	if err := h.userStore.PutUser(c.Context(), filter, params); err != nil {
@@ -51,7 +50,7 @@ func (h *UserHandler) HandlerDeleteUser(c *fiber.Ctx) error {
 func (h *UserHandler) HandlerPostUser(c *fiber.Ctx) error {
 	var params types.CreateUserParams
 	if err := c.BodyParser(&params); err != nil {
-		return err
+		return ErrBadRequest()
 	}
 	if errors := params.Validate(); len(errors) > 0 {
 		return c.JSON(errors)
@@ -81,8 +80,7 @@ func (h *UserHandler) HandlerGetUserByID(c *fiber.Ctx) error {
 func (h *UserHandler) HandlerGetUsers(c *fiber.Ctx) error {
 	user, err := h.userStore.GetUsers(c.Context())
 	if err != nil {
-		return err
+		return ErrResourceNotFound("user")
 	}
-	fmt.Println(user)
 	return c.JSON(user)
 }

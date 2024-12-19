@@ -10,7 +10,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/AliZandiWeb/hotel-reservation/api/middleware"
 	"github.com/AliZandiWeb/hotel-reservation/db/fixtures"
 	"github.com/AliZandiWeb/hotel-reservation/types"
 )
@@ -28,8 +27,8 @@ func TestUserGetBooking(t *testing.T) {
 		till = time.Now().AddDate(0, 0, 4)
 
 		booking        = fixtures.AddBooking(db.Store, user.ID, room.ID, 2, from, till)
-		app            = fiber.New()
-		route          = app.Group("/:id", middleware.JWTAuthentication(db.User))
+		app            = fiber.New(fiber.Config{ErrorHandler: Errorhandler})
+		route          = app.Group("/:id", JWTAuthentication(db.User))
 		bookingHandler = NewBookingHandler(db.Store)
 	)
 	route.Get("/", bookingHandler.HandleGetBooking)
@@ -80,7 +79,7 @@ func TestAdminGetBooking(t *testing.T) {
 
 		booking        = fixtures.AddBooking(db.Store, user.ID, room.ID, 2, from, till)
 		app            = fiber.New()
-		admin          = app.Group("/", middleware.JWTAuthentication(db.User), middleware.AdminAuth)
+		admin          = app.Group("/", JWTAuthentication(db.User), AdminAuth)
 		bookingHandler = NewBookingHandler(db.Store)
 	)
 	// fmt.Println(booking)
@@ -122,8 +121,8 @@ func TestAdminGetBooking(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.StatusCode == http.StatusOK {
-		t.Fatalf("expected a none 200 status code got %d", resp.StatusCode)
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("expected status unauthorized but got %d", resp.StatusCode)
 	}
 
 }
