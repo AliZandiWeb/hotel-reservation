@@ -31,20 +31,6 @@ func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 	return c.JSON(rooms)
 }
 
-func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-	// var qparams HotelQueryParams
-	// if err := c.QueryParser(&qparams); err != nil {
-	// 	return err
-	// }
-	// fmt.Println(qparams)
-
-	hotels, err := h.store.Hotel.GetHotels(c.Context(), nil)
-	if err != nil {
-		return ErrResourceNotFound("hotels")
-	}
-	return c.JSON(hotels)
-}
-
 func (h *HotelHandler) HandleGetHotelByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	// oid, err := primitive.ObjectIDFromHex(id)
@@ -56,4 +42,38 @@ func (h *HotelHandler) HandleGetHotelByID(c *fiber.Ctx) error {
 		return ErrResourceNotFound("hotel")
 	}
 	return c.JSON(hotel)
+}
+
+// pagination -> hotel_store.go & db.go
+
+type ResourceResponse struct {
+	Data    any `json:"data"`
+	Results int `json:""results"`
+	Page    int `json:"page"`
+}
+type HotelQueryParams struct {
+	db.Pagination
+	Rating int
+}
+
+func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
+
+	var params HotelQueryParams
+	if err := c.QueryParser(&params); err != nil {
+		return ErrBadRequest()
+	}
+	// filter
+	filter := db.Map{
+		"rating": params.Rating,
+	}
+	hotels, err := h.store.Hotel.GetHotels(c.Context(), filter, &params.Pagination)
+	if err != nil {
+		return ErrResourceNotFound("hotels")
+	}
+	resp := ResourceResponse{
+		Results: len(hotels),
+		Data:    hotels,
+		Page:    int(params.Page),
+	}
+	return c.JSON(resp)
 }
