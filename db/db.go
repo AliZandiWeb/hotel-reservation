@@ -1,10 +1,13 @@
 package db
 
-const (
-	DBNAME     = "hotel-reservation"
-	TestDBNAME = "hotel-reservation-test"
-	DBURI      = "mongodb://localhost:27017"
-)
+// const (
+//
+//	DBNAME     = "hotel-reservation"
+//	TestDBNAME = "hotel-reservation-test"
+//	DBURI      = "mongodb://localhost:27017"
+//
+// )
+const MongoDBNameEnvName = "MONGO_DB_NAME"
 
 // pagination
 type Pagination struct {
@@ -18,11 +21,3 @@ type Store struct {
 	Room    RoomStore
 	Booking BookingStore
 }
-
-// func ToObjectID(id string) (primitive.ObjectID, error) {
-// 	oid, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	return oid
-// }
