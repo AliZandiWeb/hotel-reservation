@@ -75,16 +75,14 @@ func TestAdminGetBooking(t *testing.T) {
 		room      = fixtures.AddRoom(db.Store, "small", true, 4.4, hotel.ID)
 
 		from = time.Now()
-		till = time.Now().AddDate(0, 0, 4)
+		till = from.AddDate(0, 0, 4)
 
 		booking        = fixtures.AddBooking(db.Store, user.ID, room.ID, 2, from, till)
-		app            = fiber.New()
+		app            = fiber.New(fiber.Config{ErrorHandler: Errorhandler})
 		admin          = app.Group("/", JWTAuthentication(db.User), AdminAuth)
 		bookingHandler = NewBookingHandler(db.Store)
 	)
 	// fmt.Println(booking)
-
-	_ = booking
 
 	admin.Get("/", bookingHandler.HandleGetBookings)
 	req := httptest.NewRequest("GET", "/", nil)
@@ -114,6 +112,7 @@ func TestAdminGetBooking(t *testing.T) {
 	if have.UserID != booking.UserID {
 		t.Fatalf("expected %s got %s", booking.UserID, have.UserID)
 	}
+
 	// test none-admin cannot access the bookings
 	req = httptest.NewRequest("GET", "/", nil)
 	req.Header.Add("X-Api-Token", CreateTokenFromUser(user))

@@ -34,7 +34,7 @@ func setup(t *testing.T) *testdb {
 	if err := godotenv.Load("../.env"); err != nil {
 		t.Error(err)
 	}
-	dburi := os.Getenv("MONGO_DB_NAME_TEST")
+	dburi := os.Getenv("MONGO_DB_URL_TEST")
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dburi))
 	if err != nil {
 		log.Fatal(err)

@@ -17,7 +17,6 @@ func Errorhandler(c *fiber.Ctx, err error) error {
 	}
 	// return c.JSON(map[string]string{"error": err.Error()})
 	apiError := NewError(http.StatusInternalServerError, err.Error())
-
 	return c.Status(apiError.Code).JSON(apiError)
 }
 
